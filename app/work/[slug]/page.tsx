@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { TransitionLink } from "@/components/page-transition";
 import { PlaceholderArt } from "@/components/placeholder-art";
 import { Reveal } from "@/components/reveal";
 import { projects } from "@/lib/content";
+import { CoworkingCase, generateCoworkingMetadata } from "@/components/coworking-case";
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.id }));
@@ -15,6 +17,7 @@ export async function generateMetadata(
   const { slug } = await props.params;
   const project = projects.find((p) => p.id === slug);
   if (!project) return {};
+  if (project.id === "coworking-saas") return generateCoworkingMetadata();
   return {
     title: project.name,
     description: project.intro,
@@ -27,6 +30,7 @@ export default async function CasePage(props: PageProps<"/work/[slug]">) {
   if (idx === -1) notFound();
 
   const project = projects[idx];
+  if (project.id === "coworking-saas") return <CoworkingCase />;
   const next = projects[(idx + 1) % projects.length];
   const blinds = Array.from({ length: 8 });
 
@@ -74,11 +78,35 @@ export default async function CasePage(props: PageProps<"/work/[slug]">) {
 
       <div className="case__intro">
         <span className="site-eyebrow">Overview</span>
-        <p>{project.intro}</p>
+        <div>
+          <p>{project.intro}</p>
+          {project.id === "bookswap" ? (
+            <a
+              className="case__github"
+              href="https://github.com/HamzaMb-code/BookSwapProject"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View source on GitHub <span aria-hidden="true">↗</span>
+            </a>
+          ) : null}
+        </div>
       </div>
 
       <div className="case__img">
-        <PlaceholderArt hue={project.hue} label="Cover" />
+        {project.id === "bookswap" ? (
+          <Image
+            src="/images/projects/book-swap/bookswap_heroSection.png"
+            alt="BookSwap homepage introducing the student book exchange marketplace."
+            width={1920}
+            height={1080}
+            sizes="(max-width: 760px) 100vw, 92vw"
+            loading="lazy"
+            className="case__img__shot"
+          />
+        ) : (
+          <PlaceholderArt hue={project.hue} label="Cover" />
+        )}
       </div>
 
       <div className="case__block">

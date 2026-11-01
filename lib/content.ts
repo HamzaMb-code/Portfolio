@@ -16,19 +16,42 @@ export type Project = {
 };
 
 export const profile = {
-  name: "Hamza M'Barki",
+  name: "Hamza M'barki",
   role: "Full-Stack Web Developer",
   location: "Casablanca, Morocco",
   email: "hamzambarki023@gmail.com",
   domain: "hamzambarki.dev",
   availability: "Open to full-stack roles",
   socials: {
-    github: "#",
+    github: "https://github.com/HamzaMb-code",
     linkedin: "https://www.linkedin.com/in/hamza-mbarki-514926352",
   },
 };
 
 export const projects: Project[] = [
+  {
+    id: "coworking-saas",
+    name: "Coworking SaaS",
+    title: ["COWORKING", "SAAS"],
+    featured: true,
+    tags: ["Next.js", "Laravel", "MySQL", "Multi-tenant SaaS"],
+    year: "2026",
+    client: "Personal project",
+    role: "Full-Stack Developer",
+    services: "Product design, Front-end, API, Data architecture",
+    hue: 158,
+    intro:
+      "An end-to-end coworking management platform for workspace owners, staff, and customers, bringing resource bookings and manual payment workflows into one place.",
+    challenge:
+      "Coworking teams coordinate spaces, availability, reservations, and payment records across disconnected workflows. The platform is designed to bring those operations together while keeping each workspace’s data and permissions scoped to its members.",
+    approach:
+      "The supplied project brief describes a Next.js and TypeScript interface communicating with a Laravel REST API, Laravel Sanctum authentication, and MySQL persistence. Booking prices and availability are validated server-side; bank transfer declarations and reception cash payments are reviewed by authorized workspace staff.",
+    stats: [
+      ["3", "Workspace roles"],
+      ["2", "Manual payment methods"],
+      ["1", "Workspace-scoped platform"],
+    ],
+  },
   {
     id: "bookswap",
     name: "BookSwap",
@@ -137,6 +160,6 @@ export const dossier = [
   { label: "Focus", value: "React / Next.js + Laravel" },
   { label: "Status", value: "Recent graduate, 2026" },
   { label: "Currently", value: "Open to full-stack roles" },
-  { label: "Languages", value: "Arabic, French, English" },
+  { label: "Languages", value: "Arabic, English, French" },
   { label: "Say hi", value: profile.email },
 ];

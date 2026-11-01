@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { profile } from "@/lib/content";
 import { LenisProvider } from "@/components/lenis-provider";
@@ -12,10 +12,11 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteMenu } from "@/components/site-menu";
 import { SiteFooter } from "@/components/site-footer";
 
-const hanken = Hanken_Grotesk({
+const hanken = localFont({
+  src: "./fonts/HankenGrotesk-Latin.woff2",
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "400 800",
+  display: "swap",
 });
 
 const siteUrl = `https://${profile.domain}`;
