@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Reveal } from "@/components/reveal";
 import { TransitionLink } from "@/components/page-transition";
 import { profile, dossier, principles } from "@/lib/content";
@@ -34,6 +35,14 @@ export default function AboutPage() {
         <div className="ahero__right">
           <div className="about__portraitWrap">
             <div className="about__portrait">
+              <Image
+                src="/images/portfolio-image.png"
+                alt={`Portrait of ${profile.name}`}
+                fill
+                priority
+                sizes="(max-width: 820px) 90vw, 40vw"
+                style={{ objectFit: "cover", objectPosition: "center 42%" }}
+              />
               <figcaption>{profile.name}</figcaption>
             </div>
           </div>

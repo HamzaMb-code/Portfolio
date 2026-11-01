@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Reveal } from "@/components/reveal";
 import { TransitionLink } from "@/components/page-transition";
 import { profile } from "@/lib/content";
@@ -25,6 +26,13 @@ export function AboutPreview() {
           </h2>
           <div className="about__portraitWrap">
             <div className="about__portrait">
+              <Image
+                src="/images/portfolio-image.png"
+                alt={`Portrait of ${profile.name}`}
+                fill
+                sizes="(max-width: 820px) 90vw, 40vw"
+                style={{ objectFit: "cover", objectPosition: "center 42%" }}
+              />
               <figcaption>{profile.name}</figcaption>
             </div>
             <div className="badge" aria-hidden="true">
