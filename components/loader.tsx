@@ -11,36 +11,51 @@ export function Loader() {
   const [skip, setSkip] = useState(true);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY)) {
-      setSkip(true);
-      return;
-    }
-    sessionStorage.setItem(SESSION_KEY, "1");
-    setSkip(false);
+    if (
+      sessionStorage.getItem(SESSION_KEY) ||
+      document.readyState === "complete"
+    ) return;
 
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    if (reduced) {
-      setPct(100);
-      setDone(true);
-      return;
-    }
+    sessionStorage.setItem(SESSION_KEY, "1");
+    let loaderShown = false;
+    const showTimer = window.setTimeout(() => {
+      loaderShown = true;
+      if (reduced) {
+        setPct(100);
+        setDone(true);
+      }
+      setSkip(false);
+    }, 0);
 
-    const duration = 1100;
+    if (reduced) return () => window.clearTimeout(showTimer);
+
     const start = performance.now();
     let raf = 0;
     function tick(now: number) {
-      const t = Math.min(1, (now - start) / duration);
-      setPct(Math.round(t * 100));
-      if (t < 1) {
+      const nextPct = Math.min(95, Math.floor((now - start) / 11));
+      setPct(nextPct);
+      if (nextPct < 95) {
         raf = requestAnimationFrame(tick);
-      } else {
-        setTimeout(() => setDone(true), 200);
       }
     }
+    function onLoad() {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(showTimer);
+      if (!loaderShown) return;
+      setPct(100);
+      setDone(true);
+    }
+
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    window.addEventListener("load", onLoad, { once: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(showTimer);
+      window.removeEventListener("load", onLoad);
+    };
   }, []);
 
   if (skip) return null;

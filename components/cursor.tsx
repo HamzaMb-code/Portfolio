@@ -15,6 +15,7 @@ export function Cursor() {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     if (!fine) return;
 
+    let activeCursor = "dot:";
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
     let raf = 0;
@@ -22,10 +23,11 @@ export function Cursor() {
     function onMove(e: PointerEvent) {
       x = e.clientX;
       y = e.clientY;
-    }
-    function loop() {
-      if (el) el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
-      raf = requestAnimationFrame(loop);
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        el!.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+        raf = 0;
+      });
     }
     function onOver(e: PointerEvent) {
       const target = (e.target as HTMLElement)?.closest?.(
@@ -33,15 +35,23 @@ export function Cursor() {
       ) as HTMLElement | null;
       if (target) {
         const kind = target.dataset.cursor;
-        setCursor(kind === "case" ? "case" : "ring", target.dataset.cursorLabel ?? "");
+        const mode = kind === "case" ? "case" : "ring";
+        const label = target.dataset.cursorLabel ?? "";
+        const nextCursor = `${mode}:${label}`;
+        if (nextCursor !== activeCursor) {
+          activeCursor = nextCursor;
+          setCursor(mode, label);
+        }
       } else {
-        setCursor("dot");
+        if (activeCursor !== "dot:") {
+          activeCursor = "dot:";
+          setCursor("dot");
+        }
       }
     }
 
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerover", onOver, { passive: true });
-    raf = requestAnimationFrame(loop);
 
     return () => {
       window.removeEventListener("pointermove", onMove);

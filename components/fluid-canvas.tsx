@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 
 const SIM_RESOLUTION = 128;
 const DYE_RESOLUTION = 768;
+const IDLE_TIMEOUT = 350;
 const DENSITY_DISSIPATION = 3.2;
 const VELOCITY_DISSIPATION = 2;
 const PRESSURE_ITERATIONS = 18;
@@ -547,6 +548,7 @@ export function FluidCanvas() {
       dy: 0,
       color: [0.3, 0.1, 0.05],
     };
+    let lastPointerMove = 0;
 
     function randomColor(): [number, number, number] {
       const hue = 0.025 + Math.random() * 0.035; // narrow orange-red band, no yellow/green drift
@@ -581,7 +583,6 @@ export function FluidCanvas() {
 
     let lastTime = performance.now();
     let rafId = 0;
-    let ready = false;
 
     function step(dt: number) {
       gl!.disable(gl!.BLEND);
@@ -676,6 +677,7 @@ export function FluidCanvas() {
     }
 
     function update() {
+      rafId = 0;
       const now = performance.now();
       let dt = (now - lastTime) / 1000;
       dt = Math.min(dt, 1 / 30);
@@ -691,7 +693,29 @@ export function FluidCanvas() {
 
       step(dt);
       render();
-      rafId = requestAnimationFrame(update);
+
+      if (pointer.down && now - lastPointerMove < IDLE_TIMEOUT) {
+        rafId = requestAnimationFrame(update);
+      } else {
+        pointer.down = false;
+      }
+    }
+
+    function onVisibilityChange() {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        return;
+      }
+
+      lastTime = performance.now();
+      if (
+        pointer.down &&
+        lastTime - lastPointerMove < IDLE_TIMEOUT &&
+        !rafId
+      ) {
+        rafId = requestAnimationFrame(update);
+      }
     }
 
     function toSimCoords(clientX: number, clientY: number) {
@@ -712,18 +736,19 @@ export function FluidCanvas() {
       pointer.dy = dy;
       pointer.down = true;
       pointer.color = randomColor();
-      if (!ready) {
-        ready = true;
+      lastPointerMove = performance.now();
+      if (!document.hidden && !rafId) {
+        rafId = requestAnimationFrame(update);
       }
     }
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-
-    rafId = requestAnimationFrame(update);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
